@@ -1,5 +1,10 @@
 # Surfs up Flask APP
 
+# Having issues with jinja2 modulenotfounderror 
+# App architecture seems good
+#
+
+from os import stat
 from flask import Flask, jsonify
 import sqlalchemy
 from sqlalchemy import create_engine, func
@@ -65,17 +70,20 @@ def tobs():
 
 # -----
 
-
-
-
-
-
-
-
-
-
-
 @app.route("/api/v1.0/temp/<start>")
 @app.route("/api/v1.0/temp/<start>/<end>")
 def start(start = none, end = none):
     session = Session(engine)
+
+    s = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+
+    if not end:
+        r = session.query(*s).filter(Measurement.date >= start).all()
+        temp = list(np.ravel(r))
+        return jsonify (temp)
+
+    r = session.query(*s).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    return (r)
+
+if __name__ == '__main__':
+    app.run()
