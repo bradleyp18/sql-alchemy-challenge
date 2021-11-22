@@ -26,6 +26,7 @@ app = Flask(__name__)
 @app.route("/")
 def Home():
     return (
+        f""
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
@@ -86,4 +87,4 @@ def start(start = none, end = none):
     return (r)
 
 if __name__ == '__main__':
-    app.run()
+    app.run()(debug = True)
