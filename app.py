@@ -35,7 +35,7 @@ def percipitation():
     recentDate = dt.datetime.strptime(recentDate[0],'%Y-%m-%d')
     firstDate = recentDate - timedelta(days = 365)
     r = (session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= firstDate).order_by(Measurement.date).all())
-    return jasonify(r)
+    return jsonify(r)
 
 # -----
 
@@ -44,13 +44,29 @@ def stations():
   session  = Session(engine)
 
   stationsList = session.query(Station.station, Station.name).all()
-  return jasonify (stationsList)
+  return jsonify (stationsList)
 
 # -----
 
 @app.route("/api/v1.0/tobs")
 def tobs():
     session = Session(engine)
+
+    recentDate = session.query(Measurement.date).order_by(Measurement.date.desc()).first
+    recentDate = dt.datetime.strptime(recentDate[0],'%Y-%m-%d')
+    firstDate = recentDate - timedelta(days = 365)
+
+    stationCount = (session.query(Measurement.station, func.count).filter(Measurement.station)).group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
+    top = (stationCount[0])
+    topStation = (top[0])
+    (session.query(func.min(Measurement.tobs),func.max(Measurement.tobs), func.avg(Measurement.tobs),).filter(Measurement.station == topStation).all())
+    topStationYear = session.query(Measurement.tobs).filter(Measurement.station == topStation).filter(Measurement.date >= firstDate).all()
+    return jsonify (topStationYear)
+
+# -----
+
+
+
 
 
 
