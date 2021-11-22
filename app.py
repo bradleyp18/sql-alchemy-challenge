@@ -31,24 +31,27 @@ def Home():
 def percipitation():
     session = Session(engine)
 
+    recentDate = session.query(Measurement.date).order_by(Measurement.date.desc()).first
+    recentDate = dt.datetime.strptime(recentDate[0],'%Y-%m-%d')
+    firstDate = recentDate - timedelta(days = 365)
+    r = (session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= firstDate).order_by(Measurement.date).all())
+    return jasonify(r)
 
-
-
-
-
-
-
+# -----
 
 @app.route("/api/v1.0/stations")
 def stations():
   session  = Session(engine)
 
+  stationsList = session.query(Station.station, Station.name).all()
+  return jasonify (stationsList)
 
-
+# -----
 
 @app.route("/api/v1.0/tobs")
 def tobs():
     session = Session(engine)
+
 
 
 
